@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 
 	"github.com/DrmagicE/gmqtt/server"
 )
@@ -36,8 +37,12 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 		if client.ClientOptions().Username == "root" {
 			return nil
 		}
+
 		// ... 只允许sub_list中的主题可以被订阅
 		the_sub := req.Subscribe.Topics[0].Name
+		if find := strings.Contains(the_sub, "custom/sub/"+client.ClientOptions().Username+"/"); find {
+			return nil
+		}
 		flag := false
 		var sub_list = [3]string{"device/attributes", "device/event", "device/serves"}
 		for _, sub := range sub_list {
@@ -62,6 +67,9 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 		}
 		// ... 只允许sub_list中的主题可以发布
 		the_pub := string(req.Publish.TopicName)
+		if find := strings.Contains(the_pub, "custom/pub/"+client.ClientOptions().Username+"/"); find {
+			return nil
+		}
 		flag := false
 		var pub_list = [3]string{"device/attributes", "device/event", "device/serves"}
 		for _, pub := range pub_list {
