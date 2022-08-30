@@ -39,7 +39,7 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 		// ... 只允许sub_list中的主题可以被订阅
 		the_sub := req.Subscribe.Topics[0].Name
 		flag := false
-		var sub_list = [3]string{"attributes/operation/", "event/response/", "command/send/"}
+		var sub_list = [3]string{"device/attributes", "device/event", "device/serves"}
 		for _, sub := range sub_list {
 			if the_sub == sub+string(client.ClientOptions().Username) {
 				flag = true
@@ -63,7 +63,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 		// ... 只允许sub_list中的主题可以发布
 		the_pub := string(req.Publish.TopicName)
 		flag := false
-		var pub_list = [3]string{"attributes/telemetry", "event/report", "command/reply"}
+		var pub_list = [3]string{"device/attributes", "device/event", "device/serves"}
 		for _, pub := range pub_list {
 			if the_pub == pub {
 				flag = true
