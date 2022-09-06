@@ -74,24 +74,21 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 				Ts     int         `json:"ts"`
 				Values interface{} `json:"values"`
 			}
-			type UtilsFun struct {
-				Root []UtilsFunRoot `json:"root"`
-			}
-
 			// 消息重写
-			m := UtilsFun{}
+			m := make(map[string][]UtilsFunRoot)
 			json_err := json.Unmarshal(req.Message.Payload, &m)
 			if json_err != nil {
 				return errors.New("umarshal failed;")
 			}
 			if string(req.Publish.TopicName) == "v1/gateway/telemetry" {
-				Log.Info("================================sss")
-				// mm := make(map[string]interface{})
-				// mm["token"] = m.Root
-				// mm["values"] = m.Root[0].Values
-				// mjson, _ := json.Marshal(mm)
-				// Log.Info(string(mjson))
-				// req.Message.Payload = mjson
+				mm := make(map[string]interface{})
+				for key := range m {
+					mm["token"] = key
+					mm["values"] = m[key][0].Values
+				}
+				mjson, _ := json.Marshal(mm)
+				Log.Info(string(mjson))
+				req.Message.Payload = mjson
 				return nil
 			}
 			return nil
