@@ -37,7 +37,9 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 		if client.ClientOptions().Username == "root" {
 			return nil
 		}
-
+		if client.ClientOptions().Username == "gateway" {
+			return nil
+		}
 		// ... 只允许sub_list中的主题可以被订阅
 		the_sub := req.Subscribe.Topics[0].Name
 		if find := strings.Contains(the_sub, "custom/sub/"+client.ClientOptions().Username+"/"); find {
@@ -64,6 +66,33 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 		// root放行
 		if client.ClientOptions().Username == "root" {
 			return nil
+		}
+		//v1/gateway/telemetry
+		// ...v1/gateway/telemetry
+		if client.ClientOptions().Username == "gateway" {
+			type UtilsFunRoot struct {
+				Ts     int         `json:"ts"`
+				Values interface{} `json:"values"`
+			}
+			type UtilsFun struct {
+				Root []UtilsFunRoot `json:"root"`
+			}
+
+			// 消息重写
+			m := UtilsFun{}
+			json_err := json.Unmarshal(req.Message.Payload, &m)
+			if json_err != nil {
+				return errors.New("umarshal failed;")
+			}
+			if string(req.Publish.TopicName) == "v1/gateway/telemetry" {
+				mm := make(map[string]interface{})
+				mm["token"] = m.Root
+				mm["values"] = m.Root[0].Values
+				mjson, _ := json.Marshal(mm)
+				Log.Info(string(mjson))
+				req.Message.Payload = mjson
+				return nil
+			}
 		}
 		// ... 只允许sub_list中的主题可以发布
 		the_pub := string(req.Publish.TopicName)
