@@ -85,12 +85,13 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 				return errors.New("umarshal failed;")
 			}
 			if string(req.Publish.TopicName) == "v1/gateway/telemetry" {
-				mm := make(map[string]interface{})
-				mm["token"] = m.Root
-				mm["values"] = m.Root[0].Values
-				mjson, _ := json.Marshal(mm)
-				Log.Info(string(mjson))
-				req.Message.Payload = mjson
+				Log.Info("================================sss")
+				// mm := make(map[string]interface{})
+				// mm["token"] = m.Root
+				// mm["values"] = m.Root[0].Values
+				// mjson, _ := json.Marshal(mm)
+				// Log.Info(string(mjson))
+				// req.Message.Payload = mjson
 				return nil
 			}
 			return nil
