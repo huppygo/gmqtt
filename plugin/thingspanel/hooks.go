@@ -93,6 +93,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 				req.Message.Payload = mjson
 				return nil
 			}
+			return nil
 		}
 		// ... 只允许sub_list中的主题可以发布
 		the_pub := string(req.Publish.TopicName)
