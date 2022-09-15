@@ -115,13 +115,15 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			return err
 		}
 		// 消息重写
+		mm := make(map[string]interface{})
 		m := make(map[string]interface{})
 		json_err := json.Unmarshal(req.Message.Payload, &m)
 		if json_err != nil {
 			return errors.New("umarshal failed;")
 		}
-		m["token"] = client.ClientOptions().Username
-		mjson, _ := json.Marshal(m)
+		mm["token"] = client.ClientOptions().Username
+		mm["values"] = m
+		mjson, _ := json.Marshal(mm)
 		Log.Info(string(mjson))
 		req.Message.Payload = mjson
 		return nil
