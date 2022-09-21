@@ -14,6 +14,8 @@ func (t *Thingspanel) HookWrapper() server.HookWrapper {
 		OnBasicAuthWrapper:  t.OnBasicAuthWrapper,
 		OnSubscribeWrapper:  t.OnSubscribeWrapper,
 		OnMsgArrivedWrapper: t.OnMsgArrivedWrapper,
+		OnConnectedWrapper:  t.OnConnectedWrapper,
+		OnClosedWrapper:     t.OnClosedWrapper,
 	}
 }
 
@@ -31,6 +33,26 @@ func (t *Thingspanel) OnBasicAuthWrapper(pre server.OnBasicAuth) server.OnBasicA
 	}
 }
 
+func (t *Thingspanel) OnConnectedWrapper(pre server.OnConnected) server.OnConnected {
+	return func(ctx context.Context, client server.Client) {
+		// 客户端连接后
+		// 主题：device/status
+		// 报文：{"token":username,"SYS_STATUS":"online"}
+		// username为客户端用户名
+		Log.Info("----------------------------------------")
+	}
+
+}
+func (t *Thingspanel) OnClosedWrapper(pre server.OnClosed) server.OnClosed {
+	return func(ctx context.Context, client server.Client, err error) {
+		// 客户端断开连接后
+		// 主题：device/status
+		// 报文：{"token":username,"SYS_STATUS":"offline"}
+		// username为客户端用户名
+		Log.Info("----------------------------------------")
+	}
+
+}
 func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscribe {
 	return func(ctx context.Context, client server.Client, req *server.SubscribeRequest) error {
 		//root放行
@@ -46,7 +68,7 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 			return nil
 		}
 		flag := false
-		var sub_list = [3]string{"device/attributes", "device/event", "device/serves"}
+		var sub_list = [3]string{"device/attributes/", "device/event/", "device/serves/"}
 		for _, sub := range sub_list {
 			if the_sub == sub+string(client.ClientOptions().Username) {
 				flag = true
