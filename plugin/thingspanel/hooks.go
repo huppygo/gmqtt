@@ -121,7 +121,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			return nil
 		}
 		flag := false
-		var pub_list = [3]string{"device/attributes", "device/event", "device/serves"}
+		var pub_list = [6]string{"device/attributes", "device/event", "device/serves", "gateway/attributes", "gateway/event", "gateway/serves"}
 		for _, pub := range pub_list {
 			if the_pub == pub {
 				flag = true
