@@ -68,7 +68,7 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 			return nil
 		}
 		flag := false
-		var sub_list = [3]string{"device/attributes/", "device/event/", "device/serves/"}
+		var sub_list = [6]string{"device/attributes/", "device/event/", "device/serves/", "gateway/attributes/", "gateway/event/", "gateway/serves/"}
 		for _, sub := range sub_list {
 			if the_sub == sub+string(client.ClientOptions().Username) {
 				flag = true
