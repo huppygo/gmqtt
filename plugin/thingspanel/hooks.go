@@ -132,10 +132,10 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			return err
 		}
 		// 校验消息是否是json
-		if !json.Valid(req.Message.Payload) {
-			err := errors.New("the message is not valid;")
-			return err
-		}
+		// if !json.Valid(req.Message.Payload) {
+		// 	err := errors.New("the message is not valid;")
+		// 	return err
+		// }
 		// 消息重写
 		mm := make(map[string]interface{})
 		// m := make(map[string]interface{})
