@@ -138,13 +138,13 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 		}
 		// 消息重写
 		mm := make(map[string]interface{})
-		m := make(map[string]interface{})
-		json_err := json.Unmarshal(req.Message.Payload, &m)
-		if json_err != nil {
-			return errors.New("umarshal failed;")
-		}
+		// m := make(map[string]interface{})
+		// json_err := json.Unmarshal(req.Message.Payload, &m)
+		// if json_err != nil {
+		// 	return errors.New("umarshal failed;")
+		// }
 		mm["token"] = client.ClientOptions().Username
-		mm["values"] = m
+		mm["values"] = req.Message.Payload
 		mjson, _ := json.Marshal(mm)
 		Log.Info(string(mjson))
 		req.Message.Payload = mjson
