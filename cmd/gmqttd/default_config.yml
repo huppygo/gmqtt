@@ -40,7 +40,7 @@ mqtt:
   session_expiry_check_timer: 20s
   # The maximum lifetime of the message in seconds.
   # If a message in the queue is not sent in message_expiry time, it will be dropped, which means it will not be sent to the subscriber.
-  message_expiry: 2h
+  message_expiry: 1h
   # The lifetime of the "inflight" message in seconds.
   #	If a "inflight" message is not acknowledged by a client in inflight_expiry time, it will be removed when the message queue is full.
   inflight_expiry: 30s
@@ -160,7 +160,7 @@ plugin_order:
   - federation
   - thingspanel
 log:
-  level: info # debug | info | warn | error
+  level: error # debug | info | warn | error
   format: text # json | text
   # whether to dump MQTT packet in debug level
   dump_packet: false
