@@ -1,6 +1,11 @@
 package thingspanel
 
 import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+
 	"go.uber.org/zap"
 
 	"github.com/DrmagicE/gmqtt/config"
@@ -12,6 +17,7 @@ var _ server.Plugin = (*Thingspanel)(nil)
 const Name = "thingspanel"
 
 func init() {
+	go DefaultMqttClient.MqttInit()
 	server.RegisterPlugin(Name, New)
 	config.RegisterDefaultPluginConfig(Name, &DefaultConfig)
 }
@@ -37,4 +43,29 @@ func (t *Thingspanel) Unload() error {
 
 func (t *Thingspanel) Name() string {
 	return Name
+}
+
+func (t *Thingspanel) UpdateStatus(accessToken string, status string) {
+	url := "/api/device/status"
+	method := "POST"
+	payload := strings.NewReader(`"accessToken": "` + accessToken + `","values":{"status": "` + status + `"}}`)
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, payload)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	req.Header.Add("Content-Type", "application/json")
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(body))
 }

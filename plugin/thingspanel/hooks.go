@@ -40,8 +40,14 @@ func (t *Thingspanel) OnConnectedWrapper(pre server.OnConnected) server.OnConnec
 		// 报文：{"token":username,"SYS_STATUS":"online"}
 		// username为客户端用户名
 		Log.Info("----------------------------------------")
-	}
 
+		if client.ClientOptions().Username != "root" {
+			jsonData := `{"accessToken":"` + client.ClientOptions().Username + `","values":{"status":"1"}}`
+			if err := DefaultMqttClient.SendData("device/status", []byte(jsonData)); err != nil {
+				Log.Info("上报状态失败")
+			}
+		}
+	}
 }
 func (t *Thingspanel) OnClosedWrapper(pre server.OnClosed) server.OnClosed {
 	return func(ctx context.Context, client server.Client, err error) {
@@ -50,8 +56,13 @@ func (t *Thingspanel) OnClosedWrapper(pre server.OnClosed) server.OnClosed {
 		// 报文：{"token":username,"SYS_STATUS":"offline"}
 		// username为客户端用户名
 		Log.Info("----------------------------------------")
+		if client.ClientOptions().Username != "root" {
+			jsonData := `{"accessToken":"` + client.ClientOptions().Username + `","values":{"status":"0"}}`
+			if err := DefaultMqttClient.SendData("device/status", []byte(jsonData)); err != nil {
+				Log.Info("上报状态失败")
+			}
+		}
 	}
-
 }
 func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscribe {
 	return func(ctx context.Context, client server.Client, req *server.SubscribeRequest) error {
