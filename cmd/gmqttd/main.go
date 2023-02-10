@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"path"
 
@@ -20,8 +19,6 @@ var (
 		Long:    "Gmqtt is a MQTT broker that fully implements MQTT V5.0 and V3.1.1 protocol",
 		Version: Version,
 	}
-	enablePprof bool
-	pprofAddr   = "127.0.0.1:6060"
 )
 
 func must(err error) {
@@ -41,11 +38,6 @@ func init() {
 }
 
 func main() {
-	if enablePprof {
-		go func() {
-			http.ListenAndServe(pprofAddr, nil)
-		}()
-	}
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
