@@ -289,6 +289,7 @@ func (client *client) setError(err error) {
 						})
 					}
 				}
+				_ = client.rwc.Close() // add this line
 			}
 		}
 	})
