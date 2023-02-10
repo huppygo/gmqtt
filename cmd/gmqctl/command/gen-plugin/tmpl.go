@@ -126,6 +126,7 @@ func (v *Var) Execute(file, tmplName, tmpl string) error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 	buf := &bytes.Buffer{}
 	err = t.Execute(buf, v)
 	if err != nil {
@@ -135,7 +136,6 @@ func (v *Var) Execute(file, tmplName, tmpl string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	_, err = f.Write(out)
 	return err
 }
