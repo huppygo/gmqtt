@@ -24,6 +24,7 @@ func (t *Thingspanel) OnBasicAuthWrapper(pre server.OnBasicAuth) server.OnBasicA
 		// 处理前一个插件的OnBasicAuth逻辑
 		err = pre(ctx, client, req)
 		if err != nil {
+			Log.Error(err.Error())
 			return err
 		}
 		// ... 处理本插件的鉴权逻辑
