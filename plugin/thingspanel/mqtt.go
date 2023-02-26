@@ -81,7 +81,7 @@ func (c *MqttClient) SendData(topic string, data []byte) error {
 				i++
 			}
 		}
-		if token := c.Client.Publish(topic, 0, true, string(data)); token.Wait() && token.Error() != nil {
+		if token := c.Client.Publish(topic, 1, true, string(data)); token.Wait() && token.Error() != nil {
 			Log.Info("发送设备状态失败")
 		}
 	}()
