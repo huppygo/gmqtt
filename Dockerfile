@@ -18,7 +18,7 @@ WORKDIR /gmqttd
 COPY --from=builder /go/src/github.com/ThingsPanel/gmqtt/build/gmqttd .
 RUN mkdir /etc/gmqtt
 COPY ./cmd/gmqttd/default_config.yml /etc/gmqtt/gmqttd.yml
-#COPY ./cmd/gmqttd/gmqtt_password.yml /etc/gmqtt/gmqtt_password.yml
+COPY ./cmd/gmqttd/gmqtt_password.yml /gmqttd/gmqtt_password.yml
 ENV PATH=$PATH:/gmqttd
 RUN chmod +x gmqttd
 ENTRYPOINT ["gmqttd","start"]
