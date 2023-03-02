@@ -39,7 +39,7 @@ func (c *MqttClient) MqttInit() error {
 	opts := mqtt.NewClientOptions()
 	opts.SetUsername("root")
 	opts.SetPassword("root")
-	opts.SetClientID("e66e392a-84dd")
+	//opts.SetClientID("e66e392a-84dd")
 	opts.AddBroker("127.0.0.1:1883")
 	opts.SetAutoReconnect(true)
 	opts.SetOrderMatters(false)

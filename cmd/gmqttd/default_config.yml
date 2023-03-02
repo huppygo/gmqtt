@@ -119,7 +119,7 @@ plugins:
     # The file to store password. If it is a relative path, it locates in the same directory as the config file.
     # (e.g: ./gmqtt_password => /etc/gmqtt/gmqtt_password.yml)
     # Defaults to ./gmqtt_password.yml
-    # password_file:
+    password_file: ./gmqtt_password.yml
   federation:
     # node_name is the unique identifier for the node in the federation. Defaults to hostname.
     # node_name:
@@ -160,7 +160,7 @@ plugin_order:
   - federation
   - thingspanel
 log:
-  level: error # debug | info | warn | error
+  level: warn # debug | info | warn | error
   format: text # json | text
   # whether to dump MQTT packet in debug level
   dump_packet: false

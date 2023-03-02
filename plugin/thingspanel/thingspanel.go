@@ -17,9 +17,9 @@ var _ server.Plugin = (*Thingspanel)(nil)
 const Name = "thingspanel"
 
 func init() {
-	go DefaultMqttClient.MqttInit()
 	server.RegisterPlugin(Name, New)
 	config.RegisterDefaultPluginConfig(Name, &DefaultConfig)
+	go DefaultMqttClient.MqttInit()
 }
 
 func New(config config.Config) (server.Plugin, error) {
