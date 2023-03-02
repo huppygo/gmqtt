@@ -5,6 +5,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/google/uuid"
 )
 
 type MqttClient struct {
@@ -50,6 +51,8 @@ func (c *MqttClient) MqttInit() error {
 
 	go func() {
 		for { // 失败重连
+			uuid := uuid.New()
+			opts.SetClientID(uuid.String())
 			c.Client = mqtt.NewClient(opts)
 			reconnec_number := 0
 			if token := c.Client.Connect(); token.Wait() && token.Error() != nil {
@@ -59,7 +62,7 @@ func (c *MqttClient) MqttInit() error {
 				fmt.Println("Mqtt客户端重连成功")
 				break
 			}
-			time.Sleep(5 * time.Second)
+			time.Sleep(10 * time.Second)
 		}
 	}()
 	// Log.Error("连接MqttClIent...")
