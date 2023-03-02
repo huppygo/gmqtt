@@ -15,7 +15,6 @@ type MqttClient struct {
 var DefaultMqttClient *MqttClient = &MqttClient{}
 
 func (c *MqttClient) MqttInit() error {
-	time.Sleep(5 * time.Second)
 	// 掉线重连
 	var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 		fmt.Printf("Mqtt Connect lost: %v", err)
