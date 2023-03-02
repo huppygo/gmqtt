@@ -47,10 +47,11 @@ func (c *MqttClient) MqttInit() error {
 	opts.SetOnConnectHandler(func(c mqtt.Client) {
 		fmt.Println("Mqtt客户端已连接")
 	})
-	c.Client = mqtt.NewClient(opts)
-	reconnec_number := 0
+
 	go func() {
 		for { // 失败重连
+			c.Client = mqtt.NewClient(opts)
+			reconnec_number := 0
 			if token := c.Client.Connect(); token.Wait() && token.Error() != nil {
 				reconnec_number++
 				fmt.Println("Mqtt客户端连接失败...重试", reconnec_number)
