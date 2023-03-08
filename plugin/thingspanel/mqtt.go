@@ -15,7 +15,6 @@ type MqttClient struct {
 var DefaultMqttClient *MqttClient = &MqttClient{}
 
 func (c *MqttClient) MqttInit() error {
-	time.Sleep(15 * time.Second)
 	// 掉线重连
 	var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 		fmt.Printf("Mqtt Connect lost: %v", err)
@@ -55,6 +54,7 @@ func (c *MqttClient) MqttInit() error {
 			c.Client = mqtt.NewClient(opts)
 			if token := c.Client.Connect(); token.Wait() && token.Error() != nil {
 				reconnec_number++
+				fmt.Println(token.Error().Error())
 				fmt.Println("Mqtt客户端连接失败...重试", reconnec_number)
 			} else {
 				fmt.Println("Mqtt客户端重连成功")
