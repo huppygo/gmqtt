@@ -54,13 +54,13 @@ func (c *MqttClient) MqttInit() error {
 			c.Client = mqtt.NewClient(opts)
 			if token := c.Client.Connect(); token.Wait() && token.Error() != nil {
 				reconnec_number++
-				fmt.Println(token.Error().Error())
+				fmt.Println("错误说明：", token.Error().Error())
 				fmt.Println("Mqtt客户端连接失败...重试", reconnec_number)
 			} else {
 				fmt.Println("Mqtt客户端重连成功")
 				break
 			}
-			time.Sleep(10 * time.Second)
+			time.Sleep(5 * time.Second)
 		}
 	}()
 	// Log.Error("连接MqttClIent...")
