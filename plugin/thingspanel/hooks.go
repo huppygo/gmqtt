@@ -80,7 +80,7 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 			return nil
 		}
 		flag := false
-		var sub_list = [7]string{"device/attributes/", "device/event/", "device/serves/", "gateway/attributes/", "gateway/event/", "gateway/serves/", "attributes/relaying/"}
+		var sub_list = [8]string{"device/attributes/", "device/event/", "device/serves/", "gateway/attributes/", "gateway/event/", "gateway/serves/", "attributes/relaying/", "ota/device/infrom"}
 		for _, sub := range sub_list {
 			if the_sub == sub+string(client.ClientOptions().Username) {
 				flag = true
@@ -89,7 +89,7 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 		if flag {
 			return nil
 		} else {
-			err := errors.New("permission denied;")
+			err := errors.New("permission denied,Please subscribe to the allowed topics in accordance with the official connection specifications;")
 			return err
 		}
 	}
@@ -133,7 +133,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			return nil
 		}
 		flag := false
-		var pub_list = [6]string{"device/attributes", "device/event", "device/serves", "gateway/attributes", "gateway/event", "gateway/serves"}
+		var pub_list = [8]string{"device/attributes", "device/event", "device/serves", "gateway/attributes", "gateway/event", "gateway/serves", "ota/device/infrom", "ota/device/progress"}
 		for _, pub := range pub_list {
 			if the_pub == pub {
 				flag = true
@@ -143,7 +143,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			err := errors.New("permission denied;")
 			return err
 		}
-		//消息转发
+		//属性上报消息转发
 		if the_pub == "device/attributes" || the_pub == "gateway/attributes" {
 			if err := DefaultMqttClient.SendData("attributes/relaying/"+client.ClientOptions().Username, req.Message.Payload); err != nil {
 				Log.Info("消息转发失败")
