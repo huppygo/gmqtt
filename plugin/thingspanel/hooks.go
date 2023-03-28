@@ -65,6 +65,8 @@ func (t *Thingspanel) OnClosedWrapper(pre server.OnClosed) server.OnClosed {
 		}
 	}
 }
+
+// 订阅消息钩子函数
 func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscribe {
 	return func(ctx context.Context, client server.Client, req *server.SubscribeRequest) error {
 		//root放行
@@ -80,7 +82,7 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 			return nil
 		}
 		flag := false
-		var sub_list = [8]string{"device/attributes/", "device/event/", "device/serves/", "gateway/attributes/", "gateway/event/", "gateway/serves/", "attributes/relaying/", "ota/device/infrom"}
+		var sub_list = [8]string{"device/attributes/", "device/event/", "device/serves/", "gateway/attributes/", "gateway/event/", "gateway/serves/", "attributes/relaying/", "ota/device/infrom/"}
 		for _, sub := range sub_list {
 			if the_sub == sub+string(client.ClientOptions().Username) {
 				flag = true
