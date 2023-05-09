@@ -82,7 +82,7 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 			return nil
 		}
 		flag := false
-		var sub_list = [8]string{"device/attributes/", "device/event/", "device/command/", "gateway/attributes/", "gateway/event/", "gateway/serves/", "attributes/relaying/", "ota/device/infrom/"}
+		var sub_list = [8]string{"device/attributes/", "device/event/", "device/command/", "gateway/attributes/", "gateway/event/", "gateway/serves/", "attributes/relaying/", "ota/device/inform/"}
 		for _, sub := range sub_list {
 			if the_sub == sub+string(client.ClientOptions().Username) {
 				flag = true
@@ -135,7 +135,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			return nil
 		}
 		flag := false
-		var pub_list = [8]string{"device/attributes", "device/event", "device/command", "gateway/attributes", "gateway/event", "gateway/serves", "ota/device/infrom", "ota/device/progress"}
+		var pub_list = [8]string{"device/attributes", "device/event", "device/command", "gateway/attributes", "gateway/event", "gateway/serves", "ota/device/inform", "ota/device/progress"}
 		for _, pub := range pub_list {
 			if the_pub == pub {
 				flag = true
