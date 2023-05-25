@@ -9,11 +9,15 @@ listeners:
 #      cacert: "path_to_ca_cert_file"
 #      cert: "path_to_cert_file"
 #      key: "path_to_key_file"
-
   - address: ":8883"
-    # websocket setting
-    websocket:
-      path: "/"
+    tls:
+      cacert: "./certs/ca.crt"
+      cert: "./certs/server.crt"
+      key: "./certs/server.key"
+  # - address: ":8883"
+  #   # websocket setting
+  #   websocket:
+  #     path: "/"
 
 api:
   grpc:
