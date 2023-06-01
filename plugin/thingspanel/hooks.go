@@ -69,22 +69,26 @@ func (t *Thingspanel) OnClosedWrapper(pre server.OnClosed) server.OnClosed {
 // 订阅消息钩子函数
 func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscribe {
 	return func(ctx context.Context, client server.Client, req *server.SubscribeRequest) error {
+		username := client.ClientOptions().Username
 		//root放行
-		if client.ClientOptions().Username == "root" {
+		if username == "root" {
 			return nil
 		}
-		if client.ClientOptions().Username == "gateway" {
+		if username == "gateway" {
 			return nil
 		}
 		// ... 只允许sub_list中的主题可以被订阅
 		the_sub := req.Subscribe.Topics[0].Name
-		if find := strings.Contains(the_sub, "custom/sub/"+client.ClientOptions().Username+"/"); find {
+		if err := OtherOnSubscribeWrapper(the_sub, username); err == nil {
+			return nil
+		}
+		if find := strings.Contains(the_sub, "custom/sub/"+username+"/"); find {
 			return nil
 		}
 		flag := false
 		var sub_list = [8]string{"device/attributes/", "device/event/", "device/command/", "gateway/attributes/", "gateway/event/", "gateway/serves/", "attributes/relaying/", "ota/device/inform/"}
 		for _, sub := range sub_list {
-			if the_sub == sub+string(client.ClientOptions().Username) {
+			if the_sub == sub+string(username) {
 				flag = true
 			}
 		}
@@ -99,31 +103,32 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 
 func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgArrived {
 	return func(ctx context.Context, client server.Client, req *server.MsgArrivedRequest) (err error) {
-		// root放行
-		if client.ClientOptions().Username == "root" {
+		username := client.ClientOptions().Username
+		// root用户放行
+		if username == "root" {
+			RootMessageForwardWrapper(req.Message.Topic, req.Message.Payload, false)
 			return nil
 		}
-		//v1/gateway/telemetry
-		// ...v1/gateway/telemetry
-		if client.ClientOptions().Username == "gateway" {
+		// gateway用户，消息重新
+		if username == "gateway" {
+			// 消息解析
 			type UtilsFunRoot struct {
 				Ts     int         `json:"ts"`
 				Values interface{} `json:"values"`
 			}
 			// 消息重写
-			m := make(map[string][]UtilsFunRoot)
-			json_err := json.Unmarshal(req.Message.Payload, &m)
+			msgMap := make(map[string][]UtilsFunRoot)
+			json_err := json.Unmarshal(req.Message.Payload, &msgMap)
 			if json_err != nil {
 				return errors.New("umarshal failed;")
 			}
 			if string(req.Publish.TopicName) == "v1/gateway/telemetry" {
-				mm := make(map[string]interface{})
-				for key := range m {
-					mm["token"] = key
-					mm["values"] = m[key][0].Values
+				newMsgMap := make(map[string]interface{})
+				for key := range msgMap {
+					newMsgMap["token"] = key
+					newMsgMap["values"] = msgMap[key][0].Values
 				}
-				mjson, _ := json.Marshal(mm)
-				Log.Info(string(mjson))
+				mjson, _ := json.Marshal(newMsgMap)
 				req.Message.Payload = mjson
 				return nil
 			}
@@ -131,11 +136,24 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 		}
 		// ... 只允许sub_list中的主题可以发布
 		the_pub := string(req.Publish.TopicName)
-		if find := strings.Contains(the_pub, "custom/pub/"+client.ClientOptions().Username+"/"); find {
+		// 额外的主题转换
+		if t, err := OtherOnMsgArrivedWrapper(the_pub, username); err == nil {
+			the_pub = t
+		}
+		if find := strings.Contains(the_pub, "custom/pub/"+username+"/"); find {
 			return nil
 		}
 		flag := false
-		var pub_list = [8]string{"device/attributes", "device/event", "device/command", "gateway/attributes", "gateway/event", "gateway/serves", "ota/device/inform", "ota/device/progress"}
+		var pub_list = [8]string{
+			"device/attributes",   //属性上报
+			"device/event",        //事件上报
+			"device/command",      //命令下发
+			"gateway/attributes",  //网关属性上报
+			"gateway/event",       //网关事件上报
+			"gateway/serves",      //网关服务调用
+			"ota/device/inform",   //设备升级通知
+			"ota/device/progress", //设备升级进度
+		}
 		for _, pub := range pub_list {
 			if the_pub == pub {
 				flag = true
@@ -147,28 +165,21 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 		}
 		//属性上报消息转发
 		if the_pub == "device/attributes" || the_pub == "gateway/attributes" {
-			if err := DefaultMqttClient.SendData("attributes/relaying/"+client.ClientOptions().Username, req.Message.Payload); err != nil {
+			if err := DefaultMqttClient.SendData("attributes/relaying/"+username, req.Message.Payload); err != nil {
 				Log.Info("消息转发失败")
 			}
 		}
-
-		// 校验消息是否是json
-		// if !json.Valid(req.Message.Payload) {
-		// 	err := errors.New("the message is not valid;")
-		// 	return err
-		// }
 		// 消息重写
-		mm := make(map[string]interface{})
-		// m := make(map[string]interface{})
-		// json_err := json.Unmarshal(req.Message.Payload, &m)
-		// if json_err != nil {
-		// 	return errors.New("umarshal failed;")
-		// }
-		mm["token"] = client.ClientOptions().Username
-		mm["values"] = req.Message.Payload
-		mjson, _ := json.Marshal(mm)
-		Log.Info(string(mjson))
-		req.Message.Payload = mjson
+		newMsgMap := make(map[string]interface{})
+		newMsgMap["token"] = username
+		newMsgMap["values"] = req.Message.Payload
+		newMsgJson, _ := json.Marshal(newMsgMap)
+		req.Message.Payload = newMsgJson
+		// 如果原主题被转换，丢弃消息，重新发布到转换后的主题
+		if the_pub != string(req.Publish.TopicName) {
+			DefaultMqttClient.SendData(the_pub, req.Message.Payload)
+			return errors.New("the topic is converted, the message is discarded;")
+		}
 		return nil
 	}
 }
