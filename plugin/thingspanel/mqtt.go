@@ -39,7 +39,7 @@ func (c *MqttClient) MqttInit() error {
 	opts := mqtt.NewClientOptions()
 	opts.SetUsername("root")
 	opts.SetPassword("root")
-	opts.AddBroker("127.0.0.1:1883")
+	opts.AddBroker("localhost:1883")
 	opts.SetAutoReconnect(true)
 	opts.SetOrderMatters(false)
 	opts.OnConnectionLost = connectLostHandler
