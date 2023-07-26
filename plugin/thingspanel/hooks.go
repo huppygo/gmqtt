@@ -86,7 +86,7 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 			return nil
 		}
 		flag := false
-		var sub_list = [8]string{"device/attributes/", "device/event/", "device/command/", "gateway/attributes/", "gateway/event/", "gateway/serves/", "attributes/relaying/", "ota/device/inform/"}
+		var sub_list = [8]string{"device/attributes/", "device/event/", "device/command/", "gateway/attributes/", "gateway/event/", "gateway/command/", "attributes/relaying/", "ota/device/inform/"}
 		for _, sub := range sub_list {
 			if the_sub == sub+string(username) {
 				flag = true
@@ -150,7 +150,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			"device/command",      //命令下发
 			"gateway/attributes",  //网关属性上报
 			"gateway/event",       //网关事件上报
-			"gateway/serves",      //网关服务调用
+			"gateway/command",     //网关命令调用
 			"ota/device/inform",   //设备升级通知
 			"ota/device/progress", //设备升级进度
 		}
