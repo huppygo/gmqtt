@@ -5,6 +5,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/pborman/uuid"
 )
 
 type MqttClient struct {
@@ -49,8 +50,8 @@ func (c *MqttClient) MqttInit() error {
 	reconnec_number := 0
 	go func() {
 		for { // 失败重连
-			// uuid := uuid.New()
-			// opts.SetClientID(uuid.String())
+			uuid := uuid.New()
+			opts.SetClientID(uuid)
 			c.Client = mqtt.NewClient(opts)
 			if token := c.Client.Connect(); token.Wait() && token.Error() != nil {
 				reconnec_number++

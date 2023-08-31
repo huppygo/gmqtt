@@ -16,6 +16,7 @@ require (
 	github.com/hashicorp/logutils v1.0.0
 	github.com/hashicorp/serf v0.9.5
 	github.com/iancoleman/strcase v0.1.2
+	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v1.4.0
 	github.com/spf13/cobra v1.0.0

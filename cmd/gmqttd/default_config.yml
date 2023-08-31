@@ -80,14 +80,14 @@ mqtt:
   #	Inflight message is the QoS 1 or QoS 2 message that has been sent out to a client but not been acknowledged yet.
   max_inflight: 100
   # Whether to store QoS 0 message for a offline session.
-  queue_qos0_messages: true
+  queue_qos0_messages: false
   # The delivery mode. The possible value can be "overlap" or "onlyonce".
   #	It is possible for a client’s subscriptions to overlap so that a published message might match multiple filters.
   #	When set to "overlap" , the server will deliver one message for each matching subscription and respecting the subscription’s QoS in each case.
   #	When set to "onlyonce", the server will deliver the message to the client respecting the maximum QoS of all the matching subscriptions.
   delivery_mode: onlyonce
   # Whether to allow a client to connect with empty client id.
-  allow_zero_length_clientid: true
+  allow_zero_length_clientid: false
 
 persistence:
   type: memory  # memory | redis
