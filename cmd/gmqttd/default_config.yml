@@ -70,7 +70,7 @@ mqtt:
   # The highest QOS level permitted for a Publish.
   maximum_qos: 2
   # Whether the server supports retained messages.
-  retain_available: true
+  retain_available: false
   # The maximum queue length of the outgoing messages.
   #	If the queue is full, some message will be dropped.
   #	The message dropping strategy is described in the document of the persistence/queue.Store interface.
