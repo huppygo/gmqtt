@@ -45,7 +45,7 @@ func (t *Thingspanel) OnConnectedWrapper(pre server.OnConnected) server.OnConnec
 		if client.ClientOptions().Username != "root" {
 			jsonData := `{"accessToken":"` + client.ClientOptions().Username + `","values":{"status":"1"}}`
 			if err := DefaultMqttClient.SendData("device/status", []byte(jsonData)); err != nil {
-				Log.Info("上报状态失败")
+				Log.Warn("上报状态失败")
 			}
 		}
 	}
@@ -60,7 +60,7 @@ func (t *Thingspanel) OnClosedWrapper(pre server.OnClosed) server.OnClosed {
 		if client.ClientOptions().Username != "root" {
 			jsonData := `{"accessToken":"` + client.ClientOptions().Username + `","values":{"status":"0"}}`
 			if err := DefaultMqttClient.SendData("device/status", []byte(jsonData)); err != nil {
-				Log.Info("上报状态失败")
+				Log.Warn("上报状态失败")
 			}
 		}
 	}

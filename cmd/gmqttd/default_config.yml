@@ -74,7 +74,7 @@ mqtt:
   # The maximum queue length of the outgoing messages.
   #	If the queue is full, some message will be dropped.
   #	The message dropping strategy is described in the document of the persistence/queue.Store interface.
-  max_queued_messages: 1000
+  max_queued_messages: 10000
   # The limits of inflight message length of the outgoing messages.
   #	Inflight message is also stored in the message queue, so it must be less than or equal to max_queued_messages.
   #	Inflight message is the QoS 1 or QoS 2 message that has been sent out to a client but not been acknowledged yet.
