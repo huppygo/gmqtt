@@ -70,7 +70,7 @@ mqtt:
   # The highest QOS level permitted for a Publish.
   maximum_qos: 2
   # Whether the server supports retained messages.
-  retain_available: true
+  retain_available: false
   # The maximum queue length of the outgoing messages.
   #	If the queue is full, some message will be dropped.
   #	The message dropping strategy is described in the document of the persistence/queue.Store interface.
@@ -80,7 +80,7 @@ mqtt:
   #	Inflight message is the QoS 1 or QoS 2 message that has been sent out to a client but not been acknowledged yet.
   max_inflight: 100
   # Whether to store QoS 0 message for a offline session.
-  queue_qos0_messages: true
+  queue_qos0_messages: false
   # The delivery mode. The possible value can be "overlap" or "onlyonce".
   #	It is possible for a client’s subscriptions to overlap so that a published message might match multiple filters.
   #	When set to "overlap" , the server will deliver one message for each matching subscription and respecting the subscription’s QoS in each case.
