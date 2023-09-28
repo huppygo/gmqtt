@@ -2,15 +2,18 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 	"path"
 
-	"github.com/spf13/cobra"
+	_ "net/http/pprof"
 
 	"github.com/DrmagicE/gmqtt/cmd/gmqttd/command"
 	_ "github.com/DrmagicE/gmqtt/persistence"
 	_ "github.com/DrmagicE/gmqtt/plugin/prometheus"
 	_ "github.com/DrmagicE/gmqtt/topicalias/fifo"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -38,6 +41,9 @@ func init() {
 }
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe(":6060", nil))
+	}()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)

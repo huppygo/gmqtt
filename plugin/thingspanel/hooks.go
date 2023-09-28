@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/DrmagicE/gmqtt/server"
@@ -43,7 +44,7 @@ func (t *Thingspanel) OnConnectedWrapper(pre server.OnConnected) server.OnConnec
 		Log.Info("----------------------------------------")
 
 		if client.ClientOptions().Username != "root" {
-			jsonData := `{"accessToken":"` + client.ClientOptions().Username + `","values":{"status":"1"}}`
+			jsonData := fmt.Sprintf(`{"accessToken":"%s","values":{"status":"1"}}`, client.ClientOptions().Username)
 			if err := DefaultMqttClient.SendData("device/status", []byte(jsonData)); err != nil {
 				Log.Warn("上报状态失败")
 			}
@@ -58,7 +59,7 @@ func (t *Thingspanel) OnClosedWrapper(pre server.OnClosed) server.OnClosed {
 		// username为客户端用户名
 		Log.Info("----------------------------------------")
 		if client.ClientOptions().Username != "root" {
-			jsonData := `{"accessToken":"` + client.ClientOptions().Username + `","values":{"status":"0"}}`
+			jsonData := fmt.Sprintf(`{"accessToken":"%s","values":{"status":"1"}}`, client.ClientOptions().Username)
 			if err := DefaultMqttClient.SendData("device/status", []byte(jsonData)); err != nil {
 				Log.Warn("上报状态失败")
 			}

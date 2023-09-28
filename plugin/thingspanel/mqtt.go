@@ -16,27 +16,6 @@ type MqttClient struct {
 var DefaultMqttClient *MqttClient = &MqttClient{}
 
 func (c *MqttClient) MqttInit() error {
-	// 掉线重连
-	// var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-	// 	fmt.Printf("Mqtt Connect lost: %v", err)
-	// 	i := 0
-	// 	for {
-
-	// 		time.Sleep(5 * time.Second)
-	// 		if !c.Client.IsConnectionOpen() {
-	// 			i++
-	// 			fmt.Println("Mqtt客户端掉线重连...", i)
-	// 			if token := c.Client.Connect(); token.Wait() && token.Error() != nil {
-	// 				fmt.Println("Mqtt客户端连接失败...")
-	// 			} else {
-	// 				break
-	// 			}
-	// 		} else {
-	// 			//subscribe(msgProc1, gatewayMsgProc)
-	// 			break
-	// 		}
-	// 	}
-	// }
 	opts := mqtt.NewClientOptions()
 	opts.SetUsername("root")
 	opts.SetPassword("root")
@@ -64,10 +43,6 @@ func (c *MqttClient) MqttInit() error {
 		}
 		time.Sleep(5 * time.Second)
 	}
-	// Log.Error("连接MqttClIent...")
-	// if token := c.Client.Connect(); token.Wait() && token.Error() != nil {
-	// 	Log.Error("MqttClIent连接失败...")
-	// }
 	return nil
 }
 
