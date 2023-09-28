@@ -2,12 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
 	"os"
 	"path"
-
-	_ "net/http/pprof"
 
 	"github.com/spf13/cobra"
 
@@ -42,10 +38,6 @@ func init() {
 }
 
 func main() {
-	go func() {
-		log.Println(http.ListenAndServe(":6060", nil))
-	}()
-
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprint(os.Stderr, err.Error())
 		os.Exit(1)
