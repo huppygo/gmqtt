@@ -289,6 +289,7 @@ func (client *client) setError(err error) {
 						})
 					}
 				}
+
 			}
 		}
 		_ = client.rwc.Close() // add this line
@@ -396,9 +397,7 @@ func (client *client) readLoop() {
 		close(client.in)
 	}()
 	for {
-		if !client.IsConnected() {
-			return
-		}
+
 		var packet packets.Packet
 		if client.IsConnected() {
 			if keepAlive := client.opts.KeepAlive; keepAlive != 0 { //KeepAlive
