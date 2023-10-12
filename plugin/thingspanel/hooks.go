@@ -59,7 +59,7 @@ func (t *Thingspanel) OnClosedWrapper(pre server.OnClosed) server.OnClosed {
 		// username为客户端用户名
 		Log.Info("----------------------------------------")
 		if client.ClientOptions().Username != "root" {
-			jsonData := fmt.Sprintf(`{"accessToken":"%s","values":{"status":"1"}}`, client.ClientOptions().Username)
+			jsonData := fmt.Sprintf(`{"accessToken":"%s","values":{"status":"0"}}`, client.ClientOptions().Username)
 			if err := DefaultMqttClient.SendData("device/status", []byte(jsonData)); err != nil {
 				Log.Warn("上报状态失败")
 			}
