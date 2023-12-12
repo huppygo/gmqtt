@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/DrmagicE/gmqtt/server"
+	"github.com/spf13/viper"
 )
 
 func (t *Thingspanel) HookWrapper() server.HookWrapper {
@@ -28,9 +29,31 @@ func (t *Thingspanel) OnBasicAuthWrapper(pre server.OnBasicAuth) server.OnBasicA
 			Log.Error(err.Error())
 			return err
 		}
+		if string(req.Connect.Username) == "root" {
+			password := viper.GetString("mqtt.password")
+			if string(req.Connect.Password) == password {
+				return nil
+			} else {
+				err := errors.New("password error;")
+				Log.Warn(err.Error())
+				return err
+			}
+		}
 		// ... 处理本插件的鉴权逻辑
 		Log.Info("鉴权Username：" + string(req.Connect.Username))
 		Log.Info("鉴权Password：" + string(req.Connect.Password))
+		device, err := GetDeviceByToken(string(req.Connect.Username))
+		if err != nil {
+			Log.Warn(err.Error())
+			return err
+		}
+		if device.Password != "" {
+			if device.Password != string(req.Connect.Password) {
+				err := errors.New("password error;")
+				Log.Warn(err.Error())
+				return err
+			}
+		}
 		return nil
 	}
 }
@@ -87,7 +110,16 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 			return nil
 		}
 		flag := false
-		var sub_list = [8]string{"device/attributes/", "device/event/", "device/command/", "gateway/attributes/", "gateway/event/", "gateway/command/", "attributes/relaying/", "ota/device/inform/"}
+		var sub_list = []string{
+			"device/attributes/",
+			"device/event/",
+			"device/command/",
+			"gateway/attributes/",
+			"gateway/event/",
+			"gateway/command/",
+			"attributes/relaying/",
+			"ota/device/inform/",
+		}
 		for _, sub := range sub_list {
 			if the_sub == sub+string(username) {
 				flag = true
@@ -96,8 +128,21 @@ func (t *Thingspanel) OnSubscribeWrapper(pre server.OnSubscribe) server.OnSubscr
 		if flag {
 			return nil
 		} else {
-			err := errors.New("permission denied,Please subscribe to the allowed topics in accordance with the official connection specifications;")
-			return err
+			//处理自定义主题
+			userTopic, err := GetUserTopicByToken(username)
+			if err == nil {
+				// 将主题中的username替换成{username}
+				user_topic := strings.Replace(the_sub, username, "{username}", -1)
+				// 自定义主题中不能有mqtt topic的通配符
+				if userTopic.UserSub.Attribute == user_topic || userTopic.UserSub.Commands == user_topic {
+					if strings.Contains(user_topic, "+") || strings.Contains(user_topic, "#") {
+						return fmt.Errorf("permission denied")
+					} else {
+						return nil
+					}
+				}
+			}
+			return fmt.Errorf("permission denied")
 		}
 	}
 }
@@ -145,7 +190,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			return nil
 		}
 		flag := false
-		var pub_list = [8]string{
+		var pub_list = []string{
 			"device/attributes",   //属性上报
 			"device/event",        //事件上报
 			"device/command",      //命令下发
@@ -154,6 +199,17 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 			"gateway/command",     //网关命令调用
 			"ota/device/inform",   //设备升级通知
 			"ota/device/progress", //设备升级进度
+		}
+		// 获取用户自定义Topic
+		userTopic, err := GetUserTopicByToken(username)
+		if err == nil {
+			pub_list = append(pub_list, userTopic.UserPub.Attribute, userTopic.UserPub.Event)
+			if the_pub == userTopic.UserPub.Attribute {
+				the_pub = "device/attributes"
+			}
+			if the_pub == userTopic.UserPub.Event {
+				the_pub = "device/event"
+			}
 		}
 		for _, pub := range pub_list {
 			if the_pub == pub {
@@ -179,7 +235,7 @@ func (t *Thingspanel) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgA
 		// 如果原主题被转换，丢弃消息，重新发布到转换后的主题
 		if the_pub != string(req.Publish.TopicName) {
 			DefaultMqttClient.SendData(the_pub, req.Message.Payload)
-			return errors.New("the topic is converted, the message is discarded;")
+			return errors.New("message is discarded;")
 		}
 		return nil
 	}
