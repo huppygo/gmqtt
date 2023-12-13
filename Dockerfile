@@ -9,7 +9,7 @@ ENV GO111MODULE on
 
 EXPOSE 1883 8883 8082 8083 8084
 
-RUN make binary
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-s' -o /go/src/github.com/ThingsPanel/gmqtt/build/gmqttd ./cmd/gmqttd
 
 FROM arm64v8/alpine:3.12
 
