@@ -9,6 +9,8 @@ BUILD_DIR	?= build
 
 # Binaries
 PROTOC		?= protoc
+# Default to amd64 if GOARCH is not set
+GOARCH ?= amd64
 
 .PHONY: help clean fmt lint vet test test-cover build build-docker all
 
