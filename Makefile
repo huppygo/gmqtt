@@ -9,6 +9,7 @@ BUILD_DIR	?= build
 
 # Binaries
 PROTOC		?= protoc
+
 # Default to amd64 if GOARCH is not set
 GOARCH ?= amd64
 
@@ -55,11 +56,6 @@ tools:
 	go get -u golang.org/x/tools/cmd/goimports
 	go get -u github.com/golang/lint/golint
 	go get github.com/golang/mock/mockgen@v1.4.4
-	# Reqire when adding proto and grpc compilation
-	# go get -u github.com/golang/protobuf/protoc-gen-go
-	# go get -u github.com/mwitkow/go-proto-validators/protoc-gen-govalidators
-	# go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-	# go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 
 # format the go source files
 fmt:
@@ -69,7 +65,7 @@ fmt:
 lint:
 	golint $(PACKAGES)
 
- # run go vet on the source files
+# run go vet on the source files
 vet:
 	go vet ./...
 
@@ -108,7 +104,7 @@ run: go-generate
 
 # generate all grpc files and mocks and build the go code
 build: go-generate
-	go build -o $(BUILD_DIR)/gmqttd ./cmd/gmqttd
+	GOARCH=$(GOARCH) go build -o $(BUILD_DIR)/gmqttd ./cmd/gmqttd
 
 # generate mocks and run short tests
 test: generate-mocks
@@ -123,7 +119,7 @@ test-bench: generate-mocks
 test-cover:
 	rm -fr coverage
 	mkdir coverage
-	go list -f '{{if gt (len .TestGoFiles) 0}}"go test -covermode count -coverprofile {{.Name}}.coverprofile -coverpkg ./... {{.ImportPath}}"{{end}}' ./... | xargs -I {} bash -c {}
+	go list -f '{{if gt (len .TestGoFiles) 0}}"GOARCH=$(GOARCH) go test -covermode count -coverprofile {{.Name}}.coverprofile -coverpkg ./... {{.ImportPath}}"{{end}}' ./... | xargs -I {} bash -c {}
 	echo "mode: count" > coverage/cover.out
 	grep -h -v "^mode:" *.coverprofile >> "coverage/cover.out"
 	rm *.coverprofile
@@ -133,7 +129,7 @@ test-all: test test-bench test-cover
 
 # Build Golang application binary with settings to enable it to run in a Docker scratch container.
 binary: go-generate
-	CGO_ENABLED=0 GOOS=linux go build  -ldflags '-s' -o $(BUILD_DIR)/gmqttd ./cmd/gmqttd
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(GOARCH) go build  -ldflags '-s' -o $(BUILD_DIR)/gmqttd ./cmd/gmqttd
 
 build-docker:
 	docker build -t gmqtt/gmqttd .
