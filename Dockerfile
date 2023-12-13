@@ -1,5 +1,4 @@
-FROM golang:alpine AS builder
-
+FROM arm64v8/alpine AS builder
 RUN apk add make git
 
 ADD . /go/src/github.com/ThingsPanel/gmqtt
@@ -12,7 +11,7 @@ EXPOSE 1883 8883 8082 8083 8084
 
 RUN make binary
 
-FROM alpine:3.12
+FROM arm64v8/alpine:3.12
 
 WORKDIR /gmqttd
 COPY --from=builder /go/src/github.com/ThingsPanel/gmqtt/build/gmqttd .
